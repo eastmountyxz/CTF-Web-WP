@@ -3,7 +3,8 @@
 
 
 解题思路：
-- WHUCTF
+- WHUCTF题目
+SQL注入、代码审计、XSS攻击
 
 参考资料：
 
