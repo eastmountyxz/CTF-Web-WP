@@ -7,6 +7,8 @@
 SQL注入、代码审计、XSS攻击
 
 BookShop
+ezphp
+easy_include
 
 参考资料：
 
