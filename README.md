@@ -11,4 +11,4 @@ ezphp
 easy_include
 
 参考资料：
-
+- [[网络安全自学篇] 八十三.WHUCTF之CSS注入、越权、csrf-token窃取及XSS总结](https://blog.csdn.net/Eastmount/article/details/106560849)
